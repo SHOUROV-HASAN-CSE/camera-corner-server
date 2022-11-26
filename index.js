@@ -14,7 +14,7 @@ app.use(express.json());
 
 
 //Mongodb connect
-const uri = "mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.secdjxe.mongodb.net/?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.secdjxe.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
@@ -39,6 +39,60 @@ function verifyJWT(req, res, next){
 }
 
 
+// Main Function
+async function run(){
+
+  try{
+
+    const cameraCollection = client.db('cameraCorner').collection('categories');
+    const bookingsCollection = client.db('cameraCorner').collection('bookings');
+
+
+  app.post('/jwt', (req, res) =>{
+    const user = req.body;
+    const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1 days'})
+    console.log(user);
+    res.send({token})
+  });
+  
+  app.get('/categories', async (req, res) => {
+    let query = {};
+
+    if (req.query.name) {
+        query = {
+          category: req.query.name
+        }
+    }
+    const cursor = cameraCollection.find(query);
+    const categories = await cursor.toArray();
+    res.send(categories);
+});
+
+  app.post('/bookings', async (req, res) => {
+    const booking = req.body;
+    const result = await bookingsCollection.insertOne(booking);
+    res.send(result);
+  });
+
+
+ 
+
+
+
+
+
+
+  }
+
+  finally{
+
+  }
+
+
+
+}
+
+run().catch(err=> console.error(err));
 
 
 
