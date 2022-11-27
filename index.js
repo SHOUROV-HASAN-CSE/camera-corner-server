@@ -46,6 +46,7 @@ async function run(){
 
     const cameraCollection = client.db('cameraCorner').collection('categories');
     const bookingsCollection = client.db('cameraCorner').collection('bookings');
+    const usersCollection = client.db('cameraCorner').collection('users');
 
 
   app.post('/jwt', (req, res) =>{
@@ -54,6 +55,7 @@ async function run(){
     console.log(user);
     res.send({token})
   });
+  
   
   app.get('/categories', async (req, res) => {
     let query = {};
@@ -75,7 +77,27 @@ async function run(){
   });
 
 
+  
+  app.get('/bookings', async (req, res) => {
+    const email = req.query.email;
+    const decodedEmail = req.decoded.email;
+
+    if (email !== decodedEmail) {
+        return res.status(403).send({ message: 'forbidden access' });
+    }
+
+    const query = { email: email };
+    const bookings = await bookingsCollection.find(query).toArray();
+    res.send(bookings);
+})
  
+
+    app.post('/users', async (req, res) => {
+      const user = req.body;
+      console.log(user);
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+});
 
 
 
