@@ -77,6 +77,12 @@ async function run(){
   });
 
 
+  app.post('/addproduct', async (req, res) => {
+    const product = req.body;
+    const result = await cameraCollection.insertOne(product);
+    res.send(result);
+  });
+
   
   app.get('/bookings', async (req, res) => {
     let query = {};
