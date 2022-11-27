@@ -55,7 +55,7 @@ async function run(){
     console.log(user);
     res.send({token})
   });
-  
+
   
   app.get('/categories', async (req, res) => {
     let query = {};
@@ -79,27 +79,47 @@ async function run(){
 
   
   app.get('/bookings', async (req, res) => {
-    const email = req.query.email;
-    const decodedEmail = req.decoded.email;
+    let query = {};
 
-    if (email !== decodedEmail) {
-        return res.status(403).send({ message: 'forbidden access' });
+    if (req.query.name) {
+        query = {
+          category: req.query.name
+        }
     }
-
-    const query = { email: email };
-    const bookings = await bookingsCollection.find(query).toArray();
-    res.send(bookings);
+    const cursor = bookingsCollection.find(query);
+    const categories = await cursor.toArray();
+    res.send(categories);
 })
  
 
     app.post('/users', async (req, res) => {
       const user = req.body;
-      console.log(user);
       const result = await usersCollection.insertOne(user);
       res.send(result);
 });
 
 
+app.get('/users', async (req, res) => {
+  let query = {};
+
+  if (req.query.user) {
+      query = {
+        userStatus: req.query.user
+      }
+  }
+  const cursor = usersCollection.find(query);
+  const result = await cursor.toArray();
+  res.send(result);
+})
+
+
+
+app.get('/users/admin/:email', async (req, res) => {
+  const email = req.params.email;
+  const query = { email }
+  const user = await usersCollection.findOne(query);
+  res.send({ isAdmin: user?.userStatus === 'Admin' });
+})
 
 
 
