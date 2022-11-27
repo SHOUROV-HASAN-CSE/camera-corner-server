@@ -94,6 +94,7 @@ async function run(){
 
     app.post('/users', async (req, res) => {
       const user = req.body;
+      console.log(user);
       const result = await usersCollection.insertOne(user);
       res.send(result);
 });
@@ -113,7 +114,6 @@ app.get('/users', async (req, res) => {
 })
 
 
-
 app.get('/users/admin/:email', async (req, res) => {
   const email = req.params.email;
   const query = { email }
@@ -121,6 +121,13 @@ app.get('/users/admin/:email', async (req, res) => {
   res.send({ isAdmin: user?.userStatus === 'Admin' });
 })
 
+
+app.delete('/users/:email', async (req, res) => {
+  const email = req.params.email;
+  const query = { email: email  };
+  const result = await usersCollection.deleteOne(query);
+  res.send(result);
+})
 
 
 
