@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5000;
 require('dotenv').config();
@@ -52,7 +52,6 @@ async function run(){
   app.post('/jwt', (req, res) =>{
     const user = req.body;
     const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1 days'})
-    console.log(user);
     res.send({token})
   });
 
@@ -84,7 +83,7 @@ async function run(){
   });
 
   
-  app.get('/bookings', async (req, res) => {
+  app.get('/bookings', verifyJWT, async (req, res) => {
     let query = {};
 
     if (req.query.email) {
@@ -100,7 +99,6 @@ async function run(){
 
     app.post('/users', async (req, res) => {
       const user = req.body;
-      console.log(user);
       const result = await usersCollection.insertOne(user);
       res.send(result);
 });
@@ -167,10 +165,9 @@ app.delete('/myproduct/:email', async (req, res) => {
 
 
 // -------------------verify user--------------------
-app.put('/product/:email', async (req, res) => {
-  const email = req.params.email;
-  const filter = { email: email }
-  console.log(email);
+app.put('/product/:id', verifyJWT, async (req, res) => {
+  const id = req.params.id;
+  const filter = { _id: ObjectId(id) }
   const options = { upsert: true };
   const updatedDoc = {
       $set: {
@@ -194,9 +191,6 @@ app.get('/advertise', async (req, res) => {
   const result = await cursor.toArray();
   res.send(result);
 });
-
-
-
 
 
   }
