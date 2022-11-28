@@ -87,14 +87,14 @@ async function run(){
   app.get('/bookings', async (req, res) => {
     let query = {};
 
-    if (req.query.name) {
+    if (req.query.email) {
         query = {
-          category: req.query.name
+          email: req.query.email
         }
     }
     const cursor = bookingsCollection.find(query);
-    const categories = await cursor.toArray();
-    res.send(categories);
+    const result = await cursor.toArray();
+    res.send(result);
 })
  
 
@@ -134,6 +134,68 @@ app.delete('/users/:email', async (req, res) => {
   const result = await usersCollection.deleteOne(query);
   res.send(result);
 })
+
+
+app.get('/users/:email', async (req, res) => {
+  const email = req.params.email;
+  const query = { email: email  };
+  const result = await usersCollection.findOne(query);
+  res.send(result);
+})
+
+
+app.get('/myproduct', async (req, res) => {
+  let query = {};
+
+  if (req.query.email) {
+      query = {
+        email: req.query.email
+      }
+  }
+  const cursor = cameraCollection.find(query);
+  const result = await cursor.toArray();
+  res.send(result);
+})
+
+
+app.delete('/myproduct/:email', async (req, res) => {
+  const email = req.params.email;
+  const query = { email: email  };
+  const result = await cameraCollection.deleteOne(query);
+  res.send(result);
+})
+
+
+// -------------------verify user--------------------
+app.put('/product/:email', async (req, res) => {
+  const email = req.params.email;
+  const filter = { email: email }
+  console.log(email);
+  const options = { upsert: true };
+  const updatedDoc = {
+      $set: {
+        advertise: 'added'
+      }
+  }
+  const result = await cameraCollection.updateOne(filter, updatedDoc, options);
+  res.send(result);
+})
+
+
+app.get('/advertise', async (req, res) => {
+  let query = {};
+
+  if (req.query.name) {
+      query = {
+        advertise: req.query.name
+      }
+  }
+  const cursor = cameraCollection.find(query);
+  const result = await cursor.toArray();
+  res.send(result);
+});
+
+
 
 
 
