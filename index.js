@@ -156,12 +156,21 @@ app.get('/myproduct', async (req, res) => {
 })
 
 
-app.delete('/myproduct/:email', async (req, res) => {
-  const email = req.params.email;
-  const query = { email: email  };
+app.delete('/myproduct/:id', async (req, res) => {
+  const id = req.params.id;
+  const query = {_id: ObjectId(id)};
   const result = await cameraCollection.deleteOne(query);
   res.send(result);
 })
+
+
+app.delete('/myorders/:id', async (req, res) => {
+  const id = req.params.id;
+  const query = {_id: ObjectId(id)};
+  const result = await bookingsCollection.deleteOne(query);
+  res.send(result);
+})
+
 
 
 // -------------------verify user--------------------
